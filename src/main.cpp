@@ -13,7 +13,7 @@
 using namespace std;
 
 int main(int argc , char* argv[]){
-	
+
 	if(string(argv[1]) == "--help" || string(argv[1]) == "-h"){
 		cout << "Usage: ./main <filter> <nthreads> <[p1]> <img1> <custom_output> <[p2]> <img2>" << endl;
 		return 0; 
@@ -35,6 +35,11 @@ int main(int argc , char* argv[]){
 	else if (filter == "blackwhite") blackWhite(img);
 	else if (filter == "shades") shades(img, (unsigned char)p1);
 	else if (filter == "contrast") contrast(img, (float)p1);
+	else if (filter == "merge") {
+		ppm img2(string{argv[6]});
+		
+		img = merge(img, img2, (float)p1);
+	}
 	
    	clock_gettime(CLOCK_REALTIME, &stop);
 
