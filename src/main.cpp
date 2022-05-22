@@ -33,6 +33,7 @@ int main(int argc , char* argv[]){
 
 	if (filter == "plain") plain(img, (unsigned char)p1);
 	else if (filter == "blackwhite") blackWhite(img);
+	else if (filter == "shades") shades(img, (unsigned char)p1);
 	
    	clock_gettime(CLOCK_REALTIME, &stop);
 
