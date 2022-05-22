@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc , char* argv[]){
 	
-	if(string(argv[1]) == "-help"){
+	if(string(argv[1]) == "--help" || string(argv[1]) == "-h"){
 		cout << "Usage: ./main <filter> <nthreads> <[p1]> <img1> <custom_output> <[p2]> <img2>" << endl;
 		return 0; 
 	}
