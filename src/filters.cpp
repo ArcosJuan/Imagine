@@ -11,11 +11,13 @@
 
 using namespace std;
 
-void plain(ppm& img, unsigned char c)
-{
-
+void plain(ppm& img, unsigned char c) {
 	for(int i = 0; i < img.height; i++)
 		for(int j = 0; j < img.width; j++)			
 			img.setPixel(i, j, pixel(c,c,c));
+}
+
+
+void blackWhite(ppm& img) { shades(img, 255); }
 
 }
