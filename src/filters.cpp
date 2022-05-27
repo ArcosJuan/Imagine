@@ -22,9 +22,11 @@ void blackWhite(ppm& img) { shades(img, 255); }
 
 
 void shades(ppm& img, unsigned char shades) {
+	float range = 255/(shades-1);
 	for(int i = 0; i < img.height; i++)
 		for(int j = 0; j < img.width; j++) {
-			unsigned char grey_tone = (img.getPixel(i,j).cumsum()/3) / (255/(shades-1));
+			int grey_tone = img.getPixel(i,j).cumsum()/3/range;
+			grey_tone *= range;
 			img.setPixel(i, j, pixel(grey_tone,grey_tone,grey_tone));
 		}
 }
