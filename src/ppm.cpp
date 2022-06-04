@@ -132,10 +132,13 @@ void ppm::write(const  string &fname) {
                 inp.write(&aux, 1);
             }
         }
-
-
     } else {
          cout << "Error. Unable to open " << fname <<  endl;
     }
     inp.close();
+}
+
+// Pixel custom output.
+std::ostream& operator<<(std::ostream& out, const pixel& p) {
+    return out << "(" << p.r << ", "<< p.g << ", "<< p.b << ")";
 }
