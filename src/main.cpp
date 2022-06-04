@@ -39,7 +39,7 @@ int main(int argc , char* argv[]){
 		ppm img2(string{argv[6]});
 		merge(img, img2, (float)p1);
 	}
-	else if (filter == "blur") boxBlur(img);	
+	else if (filter == "blur") boxBlur(img, p1);
    	clock_gettime(CLOCK_REALTIME, &stop);
 
 	double accum;

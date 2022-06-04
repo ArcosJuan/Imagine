@@ -11,7 +11,7 @@
 
 using namespace std;
 
-void plain(ppm& img, unsigned char c) {
+void plain(ppm& img, unsigned char c = BLACK) {
 	for(int i = 0; i < img.height; i++)
 		for(int j = 0; j < img.width; j++)			
 			img.setPixel(i, j, pixel(c,c,c));
@@ -22,6 +22,7 @@ void blackWhite(ppm& img) { shades(img, 255); }
 
 
 void shades(ppm& img, unsigned char shades) {
+	//TODO: Validate that shades is grater than one.
 	float range = 255/(shades-1);
 	for(int i = 0; i < img.height; i++)
 		for(int j = 0; j < img.width; j++) {
@@ -75,16 +76,17 @@ void convolution_filter(ppm& img, int kernel[3][3]) {
 			out_img.setPixel(y-1,x-1, summation.mult((float)1/9).truncate());
 		}
 	}
-
 	img = out_img;
 }
 
 
-void boxBlur(ppm &img) {
+void boxBlur(ppm &img, int iterations=1) {
 	int kernel[3][3] = {
 		{1,1,1},
 		{1,1,1},
 		{1,1,1}
 	};
-	convolution_filter(img, kernel);
+	for (int i=0; i<=iterations; i++) convolution_filter(img, kernel);
+}
+
 }
