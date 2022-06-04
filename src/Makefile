@@ -1,15 +1,18 @@
 .PHONY: all clean
 
-BIN = main
+BIN = main loader
 
-CPP = main.cpp filters.cpp ppm.cpp
+CPP = main.cpp filters.cpp ppm.cpp loader.cpp
 OBJ = $(CPP:.cpp=.o)
 SRC = $(CPP)
 
-all: main
+all: main loader
 
 clean:
 	rm -f $(BIN) $(OBJ)
+
+loader: loader.o filters.o ppm.o
+	g++ -pthread -o $@ $^
 
 main: main.o filters.o ppm.o
 	g++ -pthread -o $@ $^
