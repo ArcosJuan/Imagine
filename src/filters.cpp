@@ -59,4 +59,23 @@ void merge(ppm& img1, ppm& img2, float alpha) {
 	}
 	img1 = out_img;
 }
+
+
+void convolution_filter(ppm& img, int kernel[3][3]) {
+	ppm out_img (img.width-2, img.height-2);
+		
+	for(int y = 1; y < img.height-1; y++) {
+		for(int x = 1; x < img.width-1; x++) {
+			pixel summation;
+			for(int i = -1; i <=1; i++) {
+				for(int j = -1; j <=1; j++) {
+					summation.addp(img.getPixel(i+y, j+x).mult(kernel[i+1][j+1])); 
+				}
+			}
+			out_img.setPixel(y-1,x-1, summation.mult((float)1/9).truncate());
+		}
+	}
+
+	img = out_img;
+}
 }
