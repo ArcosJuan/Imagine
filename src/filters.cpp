@@ -89,4 +89,37 @@ void boxBlur(ppm &img, int iterations=1) {
 	for (int i=0; i<=iterations; i++) convolution_filter(img, kernel);
 }
 
+
+void edgeDetection(ppm &img) {
+	shades(img, 8);
+	boxBlur(img, 5);
+	int kernel_x[3][3] = {
+		{1,0,-1},
+		{2,0,-2},
+		{1,0,-1}
+	};
+	int kernel_y[3][3] = {
+		{1, 2, 1},
+		{0, 0, 0},
+		{-1, -2, -1}
+	};
+	ppm img_x = img;
+	ppm img_y = img;
+	
+	convolution_filter(img_x, kernel_x);	
+	convolution_filter(img_y, kernel_y);
+
+	for(int y = 1; y < img.height-4; y++) {
+		for(int x = 1; x < img.width-4; x++) {
+			pixel pixel_x = img_x.getPixel(y,x);
+			pixel pixel_y = img_y.getPixel(y,x);
+			
+			pixel_x = pixel_x.power(2);
+			pixel_y = pixel_y.power(2);
+			pixel result = pixel_x;
+			
+			result = result.addp(pixel_y).power(((float)1/2));
+			img.setPixel(y, x, result);
+		}
+	}
 }

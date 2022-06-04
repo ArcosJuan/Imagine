@@ -40,6 +40,7 @@ int main(int argc , char* argv[]){
 		merge(img, img2, (float)p1);
 	}
 	else if (filter == "blur") boxBlur(img, p1);
+	else if (filter == "edge") edgeDetection(img);	
    	clock_gettime(CLOCK_REALTIME, &stop);
 
 	double accum;
