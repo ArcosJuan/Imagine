@@ -37,8 +37,7 @@ int main(int argc , char* argv[]){
 	else if (filter == "contrast") contrast(img, (float)p1);
 	else if (filter == "merge") {
 		ppm img2(string{argv[6]});
-		
-		img = merge(img, img2, (float)p1);
+		merge(img, img2, (float)p1);
 	}
 	
    	clock_gettime(CLOCK_REALTIME, &stop);

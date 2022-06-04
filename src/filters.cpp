@@ -43,7 +43,7 @@ void contrast(ppm& img, float contrast) {
 }
 
 
-ppm merge(ppm& img1, ppm& img2, float alpha) {
+void merge(ppm& img1, ppm& img2, float alpha) {
 	// TODO: manage exceptions  (apha <= 1 && apha >= 0).
 
 	int height = (img1.height>img2.height) ? img2.height : img1.height;
@@ -57,5 +57,6 @@ ppm merge(ppm& img1, ppm& img2, float alpha) {
 			out_img.setPixel(i,j, img1.getPixel(i,j).mult(alpha).addp(img2.getPixel(i,j).mult(1-alpha)));
 		}
 	}
-	return out_img;
+	img1 = out_img;
+}
 }
