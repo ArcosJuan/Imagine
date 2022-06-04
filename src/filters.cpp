@@ -78,4 +78,13 @@ void convolution_filter(ppm& img, int kernel[3][3]) {
 
 	img = out_img;
 }
+
+
+void boxBlur(ppm &img) {
+	int kernel[3][3] = {
+		{1,1,1},
+		{1,1,1},
+		{1,1,1}
+	};
+	convolution_filter(img, kernel);
 }
