@@ -57,6 +57,17 @@ void contrast(ppm& img, float contrast) {
 }
 
 
+void frame(ppm& img, int width, pixel color){
+	for(int y = 0; y < img.height; y++){
+		for(int x = 0; x < img.width; x++) {
+			if (y <= width | y >= img.height - width | x <= width  | x >= img.width - width) {
+				img.setPixel(y, x, color);
+			}
+		}
+	}
+}
+
+
 void merge(ppm& img1, ppm& img2, float alpha) {
 	// TODO: manage exceptions  (apha <= 1 && apha >= 0).
 
