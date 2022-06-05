@@ -33,6 +33,15 @@ void shades(ppm& img, unsigned char shades) {
 }
 
 
+void brightness(ppm& img, float b){
+	for(int i = 0; i < img.height; i++){
+		for(int j = 0; j < img.width; j++) {
+			img.setPixel(i, j, img.getPixel(i,j).add(255*b).truncate());
+		}
+	}
+}
+
+
 void contrast(ppm& img, float contrast) {
 	for(int i = 0; i < img.height; i++)
 		for(int j = 0; j < img.width; j++) {

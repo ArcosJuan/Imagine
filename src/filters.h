@@ -13,7 +13,7 @@
 
 void blackWhite(ppm& img);
 void contrast(ppm& img, float contrast);
-void brightness(ppm& img, float b, int start, int end);
+void brightness(ppm& img, float b);
 void shades(ppm& img, unsigned char shades);
 void merge(ppm& img1, ppm& img2, float alpha);
 void frame(ppm& img, pixel color, int x);

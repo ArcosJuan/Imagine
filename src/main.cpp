@@ -35,6 +35,7 @@ int main(int argc , char* argv[]){
 	else if (filter == "blackwhite") blackWhite(img);
 	else if (filter == "shades") shades(img, (unsigned char)p1);
 	else if (filter == "contrast") contrast(img, (float)p1);
+	else if (filter == "bright") brightness(img, (float)p1);
 	else if (filter == "merge") {
 		ppm img2(string{argv[6]});
 		merge(img, img2, (float)p1);
