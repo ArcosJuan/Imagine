@@ -7,14 +7,14 @@
 #include <thread>  
 #include <atomic>  
 
-#define BLACK 0
-
 using namespace std;
 
-void plain(ppm& img, unsigned char c = BLACK) {
-	for(int i = 0; i < img.height; i++)
-		for(int j = 0; j < img.width; j++)			
-			img.setPixel(i, j, pixel(c,c,c));
+void plain(ppm& img, unsigned char c) {
+	for(int y = 0; y< img.height; y++){
+		for(int x = 0; x < img.width; x++){ 
+			img.setPixel(y, x, pixel(c,c,c));
+		}
+	}
 }
 
 
@@ -22,34 +22,38 @@ void blackWhite(ppm& img) { shades(img, 255); }
 
 
 void shades(ppm& img, unsigned char shades) {
-	//TODO: Validate that shades is grater than one.
+	// TODO: manage exceptions  (shades < 1).
+
 	float range = 255/(shades-1);
-	for(int i = 0; i < img.height; i++)
-		for(int j = 0; j < img.width; j++) {
-			int grey_tone = img.getPixel(i,j).cumsum()/3/range;
+	for(int y = 0; y < img.height; y++){
+		for(int x = 0; x < img.width; x++) {
+			int grey_tone = img.getPixel(y,x).cumsum()/3/range;
 			grey_tone *= range;
-			img.setPixel(i, j, pixel(grey_tone,grey_tone,grey_tone));
+			img.setPixel(y, x, pixel(grey_tone,grey_tone,grey_tone));
 		}
+	}
 }
 
 
 void brightness(ppm& img, float b){
-	for(int i = 0; i < img.height; i++){
-		for(int j = 0; j < img.width; j++) {
-			img.setPixel(i, j, img.getPixel(i,j).add(255*b).truncate());
+	// TODO: manage exceptions  ( -1 > b > 1).
+	for(int y = 0; y < img.height; y++){
+		for(int x = 0; x < img.width; x++) {
+			img.setPixel(y, x, img.getPixel(y,x).add(255*b).truncate());
 		}
 	}
 }
 
 
 void contrast(ppm& img, float contrast) {
-	for(int i = 0; i < img.height; i++)
-		for(int j = 0; j < img.width; j++) {
+	for(int y = 0; y < img.height; y++){
+		for(int x = 0; x < img.width; x++) {
 			float f = (259*(contrast+255)) / (255*(259-contrast));
 
 			// (f*(r-128)+128, f*(b-128)+128, f*(g-128)+128).
-			img.setPixel(i,j,img.getPixel(i,j).sub(128).mult(f).add(128).truncate());
+			img.setPixel(y,x,img.getPixel(y,x).sub(128).mult(f).add(128).truncate());
 		}
+	}
 }
 
 
@@ -60,11 +64,11 @@ void merge(ppm& img1, ppm& img2, float alpha) {
 	int width = (img1.width>img2.width) ? img2.width : img1.width;
 	ppm out_img(width, height);
 
-	for(int i = 0; i < out_img.height; i++) {
-		for(int j = 0; j < out_img.width; j++) {
+	for(int y= 0; y< out_img.height; y++) {
+		for(int x = 0; x < out_img.width; x++) {
 			// (r1*p1 + r2*p2, g1*p1 + g2*p2, b1*p1 + b2*p2).
 			// p1=alpha, p2=1-alpha.
-			out_img.setPixel(i,j, img1.getPixel(i,j).mult(alpha).addp(img2.getPixel(i,j).mult(1-alpha)));
+			out_img.setPixel(y,x, img1.getPixel(y,x).mult(alpha).addp(img2.getPixel(y,x).mult(1-alpha)));
 		}
 	}
 	img1 = out_img;
