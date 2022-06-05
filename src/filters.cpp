@@ -104,6 +104,23 @@ void convolution_filter(ppm& img, int kernel[3][3]) {
 }
 
 
+void zoom(ppm &img, int n){
+	ppm out_img (img.width * n, img.height * n);
+	for(int y = 0; y < img.height; y++) {
+		for(int x = 0; x < img.width; x++) {
+			pixel p = img.getPixel(y,x);
+
+			for(int i = 0; i < n; i++) {
+				for(int j = 0; j < n; j++) {
+					out_img.setPixel(y*n + i, x*n + j, p);
+				}
+			}
+		}
+	}
+	img = out_img;
+}
+
+
 void boxBlur(ppm &img, int iterations=1) {
 	int kernel[3][3] = {
 		{1,1,1},

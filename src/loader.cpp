@@ -40,6 +40,7 @@ int main(int argc , char* argv[]){
 		else if (filter == "contrast") contrast(img, (float)p1);
 		else if (filter == "bright") brightness(img, (float)p1);
 		else if (filter == "frame") frame(img, (int)p1);
+		else if (filter == "zoom") zoom(img, (int)p1);
 		else if (filter == "blur") boxBlur(img, p1);	
 		else if (filter == "edge") edgeDetection(img);	
 	

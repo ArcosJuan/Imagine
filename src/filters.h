@@ -18,7 +18,7 @@ void shades(ppm& img, unsigned char shades);
 void merge(ppm& img1, ppm& img2, float alpha);
 void frame(ppm& img, int width, pixel color = pixel());
 void boxBlur(ppm &img, int iterations);
-void zoom(ppm &img, ppm &img_zoomed, int n);
+void zoom(ppm &img, int n);
 void edgeDetection(ppm &img);
 void plain(ppm &img, unsigned char c = 0);
 
