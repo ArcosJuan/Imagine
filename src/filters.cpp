@@ -21,17 +21,35 @@ void plain(ppm& img, unsigned char c) {
 void blackWhite(ppm& img) { shades(img, 255); }
 
 
-void shades(ppm& img, unsigned char shades) {
+void shades(ppm& img, unsigned char shades, int y_start, int y_end) {
 	// TODO: manage exceptions  (shades < 1).
 
+	if (y_end == 0) y_end = img.height;
 	float range = 255/(shades-1);
-	for(int y = 0; y < img.height; y++){
+	for(int y = y_start; y < y_end; y++){
 		for(int x = 0; x < img.width; x++) {
 			int grey_tone = img.getPixel(y,x).cumsum()/3/range;
 			grey_tone *= range;
 			img.setPixel(y, x, pixel(grey_tone,grey_tone,grey_tone));
 		}
 	}
+}
+
+
+void shades_mt(ppm& img, unsigned char scale, int nthreads) {
+	int h = img.height / nthreads;
+	thread threads[nthreads];
+
+	for (int i = 0; i < nthreads; i++) {
+		if (i == nthreads-1) {
+			threads[i] = thread(shades, ref(img), scale, i*h, img.height);
+			break;	
+		} 
+		// start = i*h; end = i*h+h;
+		threads[i] = thread(shades, ref(img), scale, i*h, i*h+h); 
+	}
+	
+	for (int i = 0; i < nthreads; i++) threads[i].join();
 }
 
 
