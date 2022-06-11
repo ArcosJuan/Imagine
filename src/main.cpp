@@ -7,6 +7,7 @@
 #include <thread>
 #include <unistd.h>
 #include <fstream>      // std::ofstream
+#include "helper.h"
 #define ONE_OVER_BILLION 1E-9
 
 
@@ -14,10 +15,10 @@ using namespace std;
 
 int main(int argc , char* argv[]){
 
-	if(string(argv[1]) == "--help" || string(argv[1]) == "-h"){
+	const vector<string> args(argv, argv + argc);
 		cout << "Usage: ./main <filter> <nthreads> <[p1]> <img1> <custom_output> <[p2]> <img2>" << endl;
-		return 0; 
-	}
+	string _help = help(args);
+	if (!_help.empty()) cout << _help;
 	
 	string filter = string(argv[1]);
 	unsigned int n = atoi(argv[2]);
