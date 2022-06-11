@@ -18,7 +18,6 @@ string help(const vector<string>& args) {
             auto context = it + 1;
 
             if (context == end) return help("main");
-            else if (*context == "-f"  | *context == "--filter") return help("filter");
             else return help(*context);
         }
     }
@@ -39,5 +38,36 @@ vector<vector<string>> get_filters(const vector<string>& args){
         }
     }
     return filters;
+}
+
+bool _has_option(const vector<string>& args, vector<string> options) {
+    for (auto it = args.begin(), end = args.end(); it != end; ++it) {
+        for (auto &option : options){
+            if (*it == option) return true;
+        }
+    }
+    return false;
+}
+
+bool single_thread(const vector<string>& args) {
+    vector<string> options {"-s", "--single-thread"};
+    return _has_option(args, options);
+}
+
+bool multi_thread(const vector<string>& args) {
+    vector<string> options {"-m", "--multi-thread"};
+    return _has_option(args, options);
+}
+
+int get_multi_thread(const vector<string>& args) {  
+    try{
+        for (auto it = args.begin(), end = args.end(); it != end; ++it) {
+            if ((*it == "-m" | *it == "--multi-thread") & it + 1 != end ) return stoi(*(it+1));
+        }
+    }
+    catch (...){
+        cout << help("multi-thread") << endl;
+    }
+    return 1;
 }
 

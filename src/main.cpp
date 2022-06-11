@@ -24,7 +24,14 @@ int main(int argc , char* argv[]){
 
 		ppm img(argv[1]);
 		string out = string(argv[2]);
-		bool _single_t = single_thread(args);
+		unsigned int n_threads;
+
+		// Defines whether to define a number of threads per filter.
+		bool filter_thread = (single_thread(args) | multi_thread(args));
+		if (single_thread(args)) n_threads = 1;
+		else if (multi_thread(args)) n_threads = get_multi_thread(args);
+		else n_threads = 0;
+
 
 		cout << "Applying filters:"<< endl;
 		struct timespec start, stop;    	
@@ -33,14 +40,14 @@ int main(int argc , char* argv[]){
 	    for (vector<string> parameters: filters) {
 	    	string filter = string(parameters[0]);
 	    	
-	    	unsigned int n_threads;
-	    	if (_single_t) n_threads = 1; 
-	    	else n_threads = stoi(parameters[1]);
-	    	
+	    	unsigned int nf_threads;
+	    	if(n_threads) nf_threads = n_threads;
+    		else n_threads = stoi(parameters[1]);
+	    
 	    	string arg_1;
 	    	string arg_2;
-	    	if (parameters.size() >= 3 - _single_t) arg_1 = parameters[2 - _single_t];
-	    	if (parameters.size() >= 4 - _single_t) arg_2 = parameters[3 - _single_t];
+	    	if (parameters.size() >= 3 - filter_thread) arg_1 = parameters[2 - filter_thread];
+	    	if (parameters.size() >= 4 - filter_thread) arg_2 = parameters[3 - filter_thread];
 
 	    	cout << filter << endl;
 
