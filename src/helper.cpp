@@ -25,3 +25,19 @@ string help(const vector<string>& args) {
     return "";
 }
 
+vector<vector<string>> get_filters(const vector<string>& args){
+    vector<vector<string>>filters;
+    for (auto it = args.begin(); it != args.end(); ++it) {
+        if (*it == "-f" | *it == "--filter"){
+            vector<string> filter;
+            for (auto jt = it+1; jt != args.end(); ++jt){
+                if((*jt).find('-') < (*jt).length()) break;
+                else filter.push_back(*jt);
+            }
+            if (filter.size() > 0) filters.push_back(filter);
+            else cout << help("filter") << endl;
+        }
+    }
+    return filters;
+}
+

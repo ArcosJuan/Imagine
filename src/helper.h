@@ -7,5 +7,7 @@
 using namespace std;
 
 string help(const vector<string>& args);
+vector<vector<string>> get_filters(const vector<string>& args);
+bool single_thread(const vector<string>& args);
 
 #endif
