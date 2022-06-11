@@ -5,14 +5,14 @@
 #include <vector>
 #include "filters.h"
 #include <thread>  
-#include <atomic>  
+#include <atomic>
 
 using namespace std;
 
-void plain(ppm& img, unsigned char c) {
+void plain(ppm& img, unsigned char hue) {
 	for(int y = 0; y< img.height; y++){
 		for(int x = 0; x < img.width; x++){ 
-			img.setPixel(y, x, pixel(c,c,c));
+			img.setPixel(y, x, pixel(hue,hue,hue));
 		}
 	}
 }
@@ -75,11 +75,11 @@ void contrast(ppm& img, float contrast) {
 }
 
 
-void frame(ppm& img, int width, pixel color){
+void frame(ppm& img, int width, unsigned char hue){
 	for(int y = 0; y < img.height; y++){
 		for(int x = 0; x < img.width; x++) {
 			if (y <= width | y >= img.height - width | x <= width  | x >= img.width - width) {
-				img.setPixel(y, x, color);
+				img.setPixel(y, x, pixel(hue,hue,hue));
 			}
 		}
 	}
