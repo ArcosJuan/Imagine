@@ -9,53 +9,71 @@ using namespace std;
 
 string help(const string option) {
     map<string, string> help;
-    
-    help["main"] =  "IMAGINE - Image Filters \n"
-                    "\nUsage: main [IMG_IN] [IMG_OUT] [OPTION...] \n"
+
+    help["usage"] = "Usage: imagine [IMG_IN] [IMG_OUT] [OPTION...] \n";
+
+    help["usage-help"]          = "[-h | --help] [COMMAND] \n";
+    help["usage-filter"]        = "[-f | --filter] [FILTER_NAME] [N_THREADS] [ARG...]\n";
+    help["usage-single-thread"] = "[-s | --single-thread]\n";
+    help["usage-multi-thread"]  = "[-m | --multi-thread] [N_THREADS]\n";
+    help["usage-batch"]         = "[-b | --batch]\n";
+
+    help["args-blackwhite"] = "blackwhite [N_THREADS]\n";
+    help["args-contrast"]   = "contrast [N_THREADS] [LEVEL]\n";
+    help["args-plain"]      = "plain [N_THREADS] [HUE]\n";
+    help["args-bright"]     = "bright [N_THREADS] [BRIGHT]\n";
+    help["args-shades"]     = "shades [N_THREADS] [SCALE]\n";
+    help["args-merge"]      = "merge [N_THREADS] [IMG_2] [ALPHA]\n";
+    help["args-frame"]      = "frame [N_THREADS] [WIDTH] [HUE]\n";
+    help["args-blur"]       = "blur [N_THREADS] [LEVEL]\n";
+    help["args-zoom"]       = "zoom [N_THREADS] [LEVEL]\n";
+    help["args-edge"]       = "edge [N_THREADS]\n";
+
+
+    help["main"] =  "IMAGINE - Image Filters \n \n"
+                    + help["usage"] +
+
                     "\nOptions: \n"
-                    "   -h | --help [COMMAND] \n"
-                    "       Show command info \n\n"
-                    "   -f | --filter [FILTER_NAME] [N_THREADS] [ARG...] \n"
+                    "   " + help["usage-help"] +
+                    "       Show command info. \n\n"
+
+                    "   " + help["usage-filter"] + 
                     "       Applies the defined filter to the input image.  "
                             "You can apply this command many times and "
                             "the filters will be executed in the requested order.\n\n"
-                    "   -s | --single-thread\n"
+
+                    "   " + help["usage-single-thread"] +
                     "       Run all desired filters in a single thread.\n\n"
-                     "   -m | --multi-thread [N_THREADS]\n"
+
+                    "   " + help["usage-multi-thread"] + 
                     "       Run all desired filters in a certain number of threads.\n\n"
+
+                    "   " + help["usage-batch"] + 
+                    "       Apply filters to a batch of images in a folder (IMG_IN) and" 
+                            "save them in another directory (IMG_OUT).\n\n"
+
                     "\nFilters:\n"
-                    "   plain [N_THREADS] [HUE]\n"
-                    "   blackwhite [N_THREADS]\n"
-                    "   contrast [N_THREADS] [LEVEL]\n"
-                    "   bright [N_THREADS] [BRIGHT]\n"
-                    "   shades [N_THREADS] [SCALE]\n"
-                    "   merge [N_THREADS] [IMG_2] [ALPHA]\n"
-                    "   frame [N_THREADS] [WIDTH] [HUE]\n"
-                    "   blur [N_THREADS] [LEVEL]\n"
-                    "   zoom [N_THREADS] [LEVEL]\n"
-                    "   edge [N_THREADS]\n"
+                    "   " + help["args-plain"] +
+                    "   " + help["args-blackwhite"] + 
+                    "   " + help["args-contrast"] + 
+                    "   " + help["args-bright"] + 
+                    "   " + help["args-shades"] + 
+                    "   " + help["args-merge"] + 
+                    "   " + help["args-frame"] + 
+                    "   " + help["args-blur"] + 
+                    "   " + help["args-zoom"] + 
+                    "   " + help["args-edge"] + 
+
                     "\nExamples: \n"
-                    "   main /imgs/motor.ppm /images/output.ppm -m 6 -f contrast 50 -f frame 20 200 \n"
+                    "   imagine /imgs/motor.ppm /images/output.ppm -m 6 -f contrast 50 -f frame 20 200 \n"
                     "       Will apply the contrast and frame filters in that order in 6 threads. \n\n"
-                    "   main ./imgs/totoro.ppm /images/output.ppm -f zoom 6 4 -f blackwhite 2 -f bright 1 0.5 \n"
-                    "        Will apply zoom with 6 threads, blackwhite with 2 and bright with one in that order. \n\n";
 
+                    "   imagine ./imgs/totoro.ppm /images/output.ppm -f zoom 6 4 -f blackwhite 2 -f bright 1 0.5 \n"
+                    "        Will apply zoom with 6 threads, blackwhite with 2 and bright with one in that order. \n\n"
 
+                    "   imagine ./imgs/ /images/out/ -b -m 2 -f zoom 4 -f blur 10\n"
+                    "        Will apply zoom and blur to all the images in the './imgs' directory with 2 threads. \n\n";
 
-    help["filter"] = "Option -f: {-f|--filter} [FILTER] [N_THREADS] [ARG...]";
-    help["single-thread"] = "Option -s: {-s|--single-thread}";
-    help["multi-thread"] = "Option -s: {-m|--multi-thread} [N_THREADS]";
-
-    help["plain"] = "Usage: plain [N_THREADS] [HUE]";
-    help["blackwhite"] = "Usage: blackwhite [N_THREADS]";
-    help["contrast"] = "Usage: contrast [N_THREADS] [LEVEL]";
-    help["bright"] = "Usage: bright [N_THREADS] [BRIGHT]";
-    help["shades"] = "Usage: shades [N_THREADS] [SCALE]";
-    help["merge"] = "Usage: merge [N_THREADS] [IMG_2] [ALPHA]";
-    help["frame"] = "Usage: frame [N_THREADS] [WIDTH] [HUE]";
-    help["blur"] = "Usage: blur [N_THREADS] [LEVEL]";
-    help["zoom"] = "Usage: zoom [N_THREADS] [LEVEL]";
-    help["edge"] = "Usage: edge [N_THREADS]";
 
     return help[option];
 }
@@ -66,7 +84,10 @@ string help(const vector<string>& args) {
             auto context = it + 1;
 
             if (context == end) return help("main");
-            else return help(*context);
+            else if (!help(*context).empty()) return help(*context);
+            else if (!help("args-" + *context).empty())return help("args-" + *context);
+            else if (!help("usage-" + *context).empty()) return help("usage-" + *context);
+            else return help("main");
         }
     }
     return "";
@@ -82,7 +103,7 @@ vector<vector<string>> get_filters(const vector<string>& args){
                 else filter.push_back(*jt);
             }
             if (filter.size() > 0) filters.push_back(filter);
-            else cout << help("filter") << endl;
+            else cout << help("usage-filter") << endl;
         }
     }
     return filters;
@@ -107,6 +128,11 @@ bool multi_thread(const vector<string>& args) {
     return _has_option(args, options);
 }
 
+bool batch(const vector<string>& args) {
+    vector<string> options {"-b", "--batch"};
+    return _has_option(args, options);
+}
+
 int get_multi_thread(const vector<string>& args) {  
     try{
         for (auto it = args.begin(), end = args.end(); it != end; ++it) {
@@ -114,7 +140,7 @@ int get_multi_thread(const vector<string>& args) {
         }
     }
     catch (...){
-        cout << help("multi-thread") << endl;
+        cout << help("usage-multi-thread") << endl;
     }
     return 1;
 }
