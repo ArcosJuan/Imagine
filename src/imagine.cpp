@@ -34,18 +34,18 @@ double apply_filters(ppm& img, string output, vector<vector<string>> filters, in
 
     
 
-		if (filter == "plain") plain(img, (unsigned char)stoi(arg_1));
-		else if (filter == "blackwhite") blackWhite(img);
-		else if (filter == "shades") shades(img, (unsigned char)stoi(arg_1));
-		else if (filter == "contrast") contrast(img, stof(arg_1));
-		else if (filter == "bright") brightness(img, stof(arg_1));
-		else if (filter == "frame") frame(img, stoi(arg_1), (unsigned char)stoi(arg_2));
-		else if (filter == "zoom") zoom(img, stoi(arg_1));
-		else if (filter == "blur") boxBlur(img, stoi(arg_1));
-		else if (filter == "edge") edgeDetection(img);	
+		if (filter == "plain") plain(img, (unsigned char)stoi(arg_1), nf_threads);
+		else if (filter == "blackwhite") blackWhite(img, nf_threads);
+		else if (filter == "shades") shades(img, (unsigned char)stoi(arg_1), nf_threads);
+		else if (filter == "contrast") contrast(img, stof(arg_1), nf_threads);
+		else if (filter == "bright") brightness(img, stof(arg_1), nf_threads);
+		else if (filter == "frame") frame(img, stoi(arg_1), (unsigned char)stoi(arg_2), nf_threads);
+		else if (filter == "zoom") zoom(img, stoi(arg_1), nf_threads);
+		else if (filter == "blur") boxBlur(img, stoi(arg_1), nf_threads);
+		else if (filter == "edge") edgeDetection(img, nf_threads);	
 		else if (filter == "merge") {
 			ppm img2(arg_1);
-			merge(img, img2, stof(arg_2));
+			merge(img, img2, stof(arg_2), nf_threads);
 		}
     } 
 
