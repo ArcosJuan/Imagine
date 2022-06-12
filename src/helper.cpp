@@ -99,8 +99,9 @@ vector<vector<string>> get_filters(const vector<string>& args){
         if (*it == "-f" | *it == "--filter"){
             vector<string> filter;
             for (auto jt = it+1; jt != args.end(); ++jt){
-                if((*jt).find('-') < (*jt).length()) break;
-                else filter.push_back(*jt);
+                // if((*jt).find('-') < (*jt).length()) break;
+                // else 
+                filter.push_back(*jt);
             }
             if (filter.size() > 0) filters.push_back(filter);
             else cout << help("usage-filter") << endl;
