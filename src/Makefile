@@ -1,20 +1,17 @@
 .PHONY: all clean
 
-BIN = main loader
+BIN = imagine
 
-CPP = main.cpp filters.cpp ppm.cpp loader.cpp helper.cpp
+CPP = imagine.cpp filters.cpp ppm.cpp helper.cpp
 OBJ = $(CPP:.cpp=.o)
 SRC = $(CPP)
 
-all: main loader
+all: imagine
 
 clean:
 	rm -f $(BIN) $(OBJ)
 
-loader: loader.o filters.o ppm.o
-	g++ -pthread -o $@ $^
-
-main: main.o filters.o ppm.o helper.o
+imagine: imagine.o filters.o ppm.o helper.o
 	g++ -pthread -o $@ $^
 
 %.o: %.cpp
