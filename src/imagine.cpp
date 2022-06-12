@@ -25,7 +25,7 @@ double apply_filters(ppm& img, string output, vector<vector<string>> filters, in
     	
     	unsigned int nf_threads;
     	if(n_threads) nf_threads = n_threads;
-		else n_threads = stoi(parameters[1]);
+		else nf_threads = stoi(parameters[1]);
     
     	string arg_1;
     	string arg_2;
