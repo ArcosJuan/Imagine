@@ -214,7 +214,7 @@ void convolution_filter(ppm& img, ppm& out_img, float kernel[3][3], int y_start,
 }
 
 
-void boxBlur(ppm &img, int nthreads, int iterations) {
+void boxBlur(ppm &img, int iterations, int nthreads) {
 	float kernel[3][3] = {
 		{1/9.f,1/9.f,1/9.f},
 		{1/9.f,1/9.f,1/9.f},
