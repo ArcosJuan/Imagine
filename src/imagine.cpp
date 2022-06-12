@@ -73,6 +73,7 @@ int main(int argc , char* argv[]){
 	if (filters.size() > 0){
 
 		bool is_batch = batch(args);
+		bool testing = test(args);
 		string input = string(argv[1]);
 		string output = string(argv[2]);
 		unsigned int n_threads;
@@ -88,37 +89,78 @@ int main(int argc , char* argv[]){
 		for (vector<string> filter: filters) cout << "  - " << filter[0] << endl;
 		cout << endl;
 
-		if (!is_batch) {
-			path img_path = path(input);
-			if (img_path.extension() != ".ppm") {
-				cout << "The argument passed is not an image!" << endl;
-				cout << help("usage"); return 1;
-			}
+		if (testing){
+			auto [output_file, iterations] = get_test(args);
+			cout << output_file;
+			ofstream myfile;
+			myfile.open(output_file);
+			
+			for (auto i: args) myfile << i << " ";
+			myfile << "\n";
 
-			cout << "On image: " << string(img_path.stem()) << endl;
-			ppm img(input);
-			apply_filters(img, output, filters, n_threads, filter_thread);
+			for (int i = 0; i< iterations; i++){
+				if (!is_batch) {
+					path img_path = path(input);
+					ppm img(input);
+					double time = apply_filters(img, output, filters, n_threads, filter_thread);
+
+					myfile << time << "\n";
+				}
+				else{
+					double total_time = 0;
+
+					path out_dir = path(output); 
+					// Create the directory if it doesn't exist.
+					if (!is_directory(out_dir)) create_directory(out_dir);
+
+			 		for (const auto & image : directory_iterator(input)){
+						auto img_path = image.path();
+						if (img_path.extension() != ".ppm") continue;
+						ppm img(img_path);
+
+						path out_path = out_dir; 
+						out_path /= string(img_path.stem()) + ".ppm";
+
+						total_time += apply_filters(img, out_path, filters, n_threads, filter_thread);
+					}
+
+					myfile << total_time << "\n";
+				}
+			} 
 		}
 		else{
-			double total_time = 0;
+			if (!is_batch) {
+				path img_path = path(input);
+				if (img_path.extension() != ".ppm") {
+					cout << "The argument passed is not an image!" << endl;
+					cout << help("usage"); return 1;
+				}
 
-			path out_dir = path(output); 
-			// Create the directory if it doesn't exist.
-			if (!is_directory(out_dir)) create_directory(out_dir);
-
-	 		for (const auto & image : directory_iterator(input)){
-				auto img_path = image.path();
-				if (img_path.extension() != ".ppm") continue;
 				cout << "On image: " << string(img_path.stem()) << endl;
-				ppm img(img_path);
-
-				path out_path = out_dir; 
-				out_path /= string(img_path.stem()) + ".ppm";
-
-				total_time += apply_filters(img, out_path, filters, n_threads, filter_thread);
+				ppm img(input);
+				apply_filters(img, output, filters, n_threads, filter_thread);
 			}
+			else{
+				double total_time = 0;
 
-			printf("Total Time: %lf s\n", total_time);
+				path out_dir = path(output); 
+				// Create the directory if it doesn't exist.
+				if (!is_directory(out_dir)) create_directory(out_dir);
+
+		 		for (const auto & image : directory_iterator(input)){
+					auto img_path = image.path();
+					if (img_path.extension() != ".ppm") continue;
+					cout << "On image: " << string(img_path.stem()) << endl;
+					ppm img(img_path);
+
+					path out_path = out_dir; 
+					out_path /= string(img_path.stem()) + ".ppm";
+
+					total_time += apply_filters(img, out_path, filters, n_threads, filter_thread);
+				}
+
+				printf("Total Time: %lf s\n", total_time);
+			}
 		}
 	}
 

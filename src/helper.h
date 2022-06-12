@@ -12,6 +12,7 @@ vector<vector<string>> get_filters(const vector<string>& args);
 bool single_thread(const vector<string>& args);
 bool multi_thread(const vector<string>& args);
 bool batch(const vector<string>& args);
+bool test(const vector<string>& args);
 int get_multi_thread(const vector<string>& args);
-
+tuple<string, int> get_test(const vector<string>& args);  
 #endif

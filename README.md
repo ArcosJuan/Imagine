@@ -19,6 +19,10 @@ Run all desired filters in a certain number of threads.
     [-b | --batch]
 Apply filters to a batch of images in a folder (IMG_IN) andsave them in another directory (IMG_OUT).
 
+    [-t | --test] [OUTPUT_FILE] [ITERATIONS]
+Repeat an operation many times to help test how long it takes to perform.
+
+
 
 ## Filters:
     plain [N_THREADS] [HUE]
