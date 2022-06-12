@@ -104,18 +104,18 @@ void merge(ppm& img1, ppm& img2, float alpha) {
 }
 
 
-void convolution_filter(ppm& img, int kernel[3][3]) {
+void convolution_filter(ppm& img, float kernel[3][3]) {
 	ppm out_img (img.width-2, img.height-2);
 		
 	for(int y = 1; y < img.height-1; y++) {
 		for(int x = 1; x < img.width-1; x++) {
-			pixel summation;
+			pixel summation(0,0,0);
 			for(int i = -1; i <=1; i++) {
 				for(int j = -1; j <=1; j++) {
 					summation.addp(img.getPixel(i+y, j+x).mult(kernel[i+1][j+1])); 
 				}
 			}
-			out_img.setPixel(y-1,x-1, summation.mult((float)1/9).truncate());
+			out_img.setPixel(y-1,x-1, summation);
 		}
 	}
 	img = out_img;
@@ -140,24 +140,25 @@ void zoom(ppm &img, int n){
 
 
 void boxBlur(ppm &img, int iterations=1) {
-	int kernel[3][3] = {
-		{1,1,1},
-		{1,1,1},
-		{1,1,1}
+	float kernel[3][3] = {
+		{1/9.f,1/9.f,1/9.f},
+		{1/9.f,1/9.f,1/9.f},
+		{1/9.f,1/9.f,1/9.f}
 	};
 	for (int i=0; i<=iterations; i++) convolution_filter(img, kernel);
 }
 
 
 void edgeDetection(ppm &img) {
-	shades(img, 8);
-	boxBlur(img, 5);
-	int kernel_x[3][3] = {
+	blackWhite(img);
+	boxBlur(img, 1);
+
+	float kernel_x[3][3] = {
 		{1,0,-1},
 		{2,0,-2},
 		{1,0,-1}
 	};
-	int kernel_y[3][3] = {
+	float kernel_y[3][3] = {
 		{1, 2, 1},
 		{0, 0, 0},
 		{-1, -2, -1}
@@ -172,13 +173,13 @@ void edgeDetection(ppm &img) {
 		for(int x = 1; x < img.width-4; x++) {
 			pixel pixel_x = img_x.getPixel(y,x);
 			pixel pixel_y = img_y.getPixel(y,x);
-			
-			pixel_x = pixel_x.power(2);
-			pixel_y = pixel_y.power(2);
-			pixel result = pixel_x;
-			
-			result = result.addp(pixel_y).power(((float)1/2));
-			img.setPixel(y, x, result);
+
+			float px = pow(pixel_x.r ,2);
+			float py = pow(pixel_y.r, 2);
+			int pr = (int)sqrt(px + py);
+
+			pixel result(pr,pr,pr);
+			img.setPixel(y, x, result.truncate());
 		}
 	}
 }
