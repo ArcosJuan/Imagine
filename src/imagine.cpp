@@ -77,24 +77,91 @@ double simple_load(string input, string output, vector<vector<string>> filters, 
 
 
 double batch_load(string input, string output, vector<vector<string>> filters, int n_threads, bool filter_thread, int n_readers){
-	double total_time = 0;
+	struct timespec start, stop;    	
+	clock_gettime(CLOCK_REALTIME, &start);
 
 	path out_dir = path(output); 
 	// Create the directory if it doesn't exist.
 	if (!is_directory(out_dir)) create_directory(out_dir);
 
-		for (const auto & image : directory_iterator(input)){
+	// Stores in a vector all the paths of the images.
+	vector<path> paths;
+	for (const auto & image : directory_iterator(input)){
 		auto img_path = image.path();
 		if (img_path.extension() != ".ppm") continue;
-		cout << "On image: " << string(img_path.stem()) << endl;
-		ppm img(img_path);
-
-		path out_path = out_dir; 
-		out_path /= string(img_path.stem()) + ".ppm";
-
-		total_time += apply_filters(img, out_path, filters, n_threads, filter_thread);
+		paths.push_back(img_path);
 	}
 
+	// Sort the images by size (Bubble sort)
+    for (int i = 0; i < paths.size() - 1; i++){
+        for (int j = 0; j < paths.size() - i - 1; j++){
+            if (file_size(paths[j]) < file_size(paths[j + 1])) {
+            	swap(paths[j], paths[j + 1]);       
+            }
+        }
+    }
+
+    // // Prints the list of images and sizes.
+    // cout << "Sizes:" << endl;
+    // for (path img : paths){
+    // 	cout << string(img.stem()) << " | " << file_size(img) << endl;
+    // }
+
+
+    // Distribute the images in the threads.
+    int img_per_reader = paths.size() / n_readers;
+    int remainder = paths.size() - (n_readers * img_per_reader);
+    vector<vector<path>> threads_images;
+
+    for (int i = 0; i <= n_readers; i++){
+    	vector<path> thread_images;
+    	for (int j = 0; j < img_per_reader; j++){
+    		thread_images.push_back(paths[i + j*n_readers]);
+    	}
+    	threads_images.push_back(thread_images);
+    }
+    paths.erase(paths.begin(), paths.begin() + n_readers * img_per_reader);
+    
+
+    // Add remaining images to less busy threads.
+    for (int i = n_readers-1; i > 0; i--){
+    	if (paths.empty()) break;
+    	threads_images[i].push_back(paths[0]);
+    	paths.erase(paths.begin());
+    }
+
+
+    // // Print images per thread
+    // cout << "Images per reader: " << img_per_reader << " remainder:" << remainder << endl;
+    // for (int th = 0; th < n_readers; th++){
+    // 	cout << endl << "TH" << th << ": ";
+    // 	for (path img: threads_images[th]){
+    // 		cout << string(img.stem()) << " ";
+    // 	}
+    // }
+    // cout << endl;
+
+
+    // Create and assign tasks to threads.
+	auto filter_images = [out_dir, filters, n_threads, filter_thread](vector<path> paths){
+		for (path img_path : paths) {
+			ppm img(img_path);
+
+			path out_path = out_dir; 
+			out_path /= string(img_path.stem()) + ".ppm";
+
+			apply_filters(img, out_path, filters, n_threads, filter_thread);
+		}
+	};
+
+	thread threads[n_readers];
+    for (int i = 0; i < n_readers; i++) threads[i] = thread(filter_images, threads_images[i]);
+    for (int i = 0; i < n_readers; i++) threads[i].join();
+
+    clock_gettime(CLOCK_REALTIME, &stop);
+	double total_time;
+	total_time = ( stop.tv_sec - start.tv_sec ) + ( stop.tv_nsec - start.tv_nsec ) * ONE_OVER_BILLION;
+	
 	printf("Total Time: %lf s\n", total_time);
 	return total_time;
 }
