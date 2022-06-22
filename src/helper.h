@@ -14,5 +14,6 @@ bool multi_thread(const vector<string>& args);
 bool batch(const vector<string>& args);
 bool test(const vector<string>& args);
 int get_multi_thread(const vector<string>& args);
-tuple<string, int> get_test(const vector<string>& args);  
+tuple<string, int> get_test(const vector<string>& args);
+int get_batch(const vector<string>& args);  
 #endif

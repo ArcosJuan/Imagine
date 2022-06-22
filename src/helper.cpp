@@ -16,7 +16,7 @@ string help(const string option) {
     help["usage-filter"]        = "[-f | --filter] [FILTER_NAME] [N_THREADS] [ARG...]\n";
     help["usage-single-thread"] = "[-s | --single-thread]\n";
     help["usage-multi-thread"]  = "[-m | --multi-thread] [N_THREADS]\n";
-    help["usage-batch"]         = "[-b | --batch]\n";
+    help["usage-batch"]         = "[-b | --batch] [N_READERS]\n";
     help["usage-test"]          = "[-t | --test] [OUTPUT_FILE] [ITERATIONS]\n";
 
     help["args-blackwhite"] = "blackwhite [N_THREADS]\n";
@@ -51,7 +51,9 @@ string help(const string option) {
 
                     "   " + help["usage-batch"] + 
                     "       Apply filters to a batch of images in a folder (IMG_IN) and" 
-                            "save them in another directory (IMG_OUT).\n\n"
+                            "save them in another directory (IMG_OUT).  "
+                            "'N_READERS' represents the number of threads that "
+                            "will be used to read the images from the directory.\n\n"
 
                     "   " + help["usage-test"] + 
                     "       Repeat an operation many times " 
@@ -76,8 +78,8 @@ string help(const string option) {
                     "   imagine ./imgs/totoro.ppm /images/output.ppm -f zoom 6 4 -f blackwhite 2 -f bright 1 0.5 \n"
                     "        Will apply zoom with 6 threads, blackwhite with 2 and bright with one in that order. \n\n"
 
-                    "   imagine ./imgs/ /images/out/ -b -m 2 -f zoom 4 -f blur 10\n"
-                    "        Will apply zoom and blur to all the images in the './imgs' directory with 2 threads. \n\n";
+                    "   imagine ./imgs/ /images/out/ -b 10 -m 2 -f zoom 4 -f blur 10\n"
+                    "        Will apply zoom and blur to all the images in the './imgs' directory with 2 threads and 10 readers. \n\n";
 
 
     return help[option];
@@ -168,3 +170,14 @@ int get_multi_thread(const vector<string>& args) {
     return 1;
 }
 
+int get_batch(const vector<string>& args) {  
+    try{
+        for (auto it = args.begin(), end = args.end(); it != end; ++it) {
+            if ((*it == "-b" | *it == "--batch") & it + 1 != end ) return stoi(*(it+1));
+        }
+    }
+    catch (...){
+        cout << help("usage-batch") << endl;
+    }
+    return 1;
+}

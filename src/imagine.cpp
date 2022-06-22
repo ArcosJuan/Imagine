@@ -76,7 +76,7 @@ double simple_load(string input, string output, vector<vector<string>> filters, 
 }
 
 
-double batch_load(string input, string output, vector<vector<string>> filters, int n_threads, bool filter_thread){
+double batch_load(string input, string output, vector<vector<string>> filters, int n_threads, bool filter_thread, int n_readers){
 	double total_time = 0;
 
 	path out_dir = path(output); 
@@ -114,6 +114,7 @@ int main(int argc , char* argv[]){
 		string input = string(argv[1]);
 		string output = string(argv[2]);
 		unsigned int n_threads;
+		unsigned int n_readers;
 
 		// Defines whether to define a number of threads per filter.
 		bool filter_thread = (single_thread(args) | multi_thread(args));
@@ -121,13 +122,18 @@ int main(int argc , char* argv[]){
 		else if (multi_thread(args)) n_threads = get_multi_thread(args);
 		else n_threads = 0;
 
+		if (is_batch) n_readers = get_batch(args);
 
 		cout << "Applying filters:"<< endl;
 		for (vector<string> filter: filters) cout << "  - " << filter[0] << endl;
 		cout << endl;
 
-		auto loader = simple_load;
-		if (is_batch) loader = batch_load;
+		// Use batch or simple loading depending on the case
+		auto loader = [input, output, filters, n_threads, filter_thread](int n_readers){
+			if (n_readers) return batch_load(input, output, filters, n_threads, filter_thread, n_readers);
+			else return simple_load(input, output, filters, n_threads, filter_thread);
+		};
+
 
 		if (testing){
 			auto [output_file, iterations] = get_test(args);
@@ -138,11 +144,11 @@ int main(int argc , char* argv[]){
 			myfile << "\n";
 
 			for (int i = 0; i< iterations; i++){
-				double time = loader(input, output, filters, n_threads, filter_thread);
+				double time = loader(n_readers);
 				myfile << time << "\n";
 			} 
 		}
-		else loader(input, output, filters, n_threads, filter_thread);
+		else loader(n_readers);
 	}
 
 	return 0;
