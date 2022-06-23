@@ -234,7 +234,7 @@ void boxBlur(ppm &img, int iterations, int nthreads) {
 
 void edgeDetection(ppm &img, int nthreads) {
 	blackWhite(img, nthreads);
-	boxBlur(img, nthreads, 1);
+	boxBlur(img, 1, nthreads);
 
 	float kernel_x[3][3] = {
 		{1,0,-1},
