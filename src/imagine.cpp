@@ -113,7 +113,7 @@ double batch_load(string input, string output, vector<vector<string>> filters, i
     int remainder = paths.size() - (n_readers * img_per_reader);
     vector<vector<path>> threads_images;
 
-    for (int i = 0; i <= n_readers; i++){
+    for (int i = 0; i < n_readers; i++){
     	vector<path> thread_images;
     	for (int j = 0; j < img_per_reader; j++){
     		thread_images.push_back(paths[i + j*n_readers]);
@@ -180,14 +180,13 @@ int main(int argc , char* argv[]){
 		bool testing = test(args);
 		string input = string(argv[1]);
 		string output = string(argv[2]);
-		unsigned int n_threads;
-		unsigned int n_readers;
+		unsigned int n_threads = 0;
+		unsigned int n_readers = 0;
 
 		// Defines whether to define a number of threads per filter.
 		bool filter_thread = (single_thread(args) | multi_thread(args));
 		if (single_thread(args)) n_threads = 1;
 		else if (multi_thread(args)) n_threads = get_multi_thread(args);
-		else n_threads = 0;
 
 		if (is_batch) n_readers = get_batch(args);
 
