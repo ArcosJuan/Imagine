@@ -27,6 +27,7 @@ string help(const string option) {
     help["args-merge"]      = "merge [N_THREADS] [IMG_2] [ALPHA]\n";
     help["args-frame"]      = "frame [N_THREADS] [WIDTH] [HUE]\n";
     help["args-blur"]       = "blur [N_THREADS] [LEVEL]\n";
+    help["args-sharpen"]    = "sharpen [N_THREADS] [LEVEL]\n";
     help["args-zoom"]       = "zoom [N_THREADS] [LEVEL]\n";
     help["args-edge"]       = "edge [N_THREADS]\n";
 

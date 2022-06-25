@@ -21,6 +21,6 @@ void boxBlur(ppm& img, int iterations, int nthreads);
 void zoom(ppm& img, int n, int nthreads);
 void edgeDetection(ppm &img, int nthreads);
 void plain(ppm& img, unsigned char hue, int nthreads);
-
+void sharpen(ppm &img, int iterations, int nthreads);
 
 #endif

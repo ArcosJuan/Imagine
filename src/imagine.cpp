@@ -42,6 +42,7 @@ double apply_filters(ppm& img, string output, vector<vector<string>> filters, in
 		else if (filter == "frame") frame(img, stoi(arg_1), (unsigned char)stoi(arg_2), nf_threads);
 		else if (filter == "zoom") zoom(img, stoi(arg_1), nf_threads);
 		else if (filter == "blur") boxBlur(img, stoi(arg_1), nf_threads);
+		else if (filter == "sharpen") sharpen(img, stoi(arg_1), nf_threads);
 		else if (filter == "edge") edgeDetection(img, nf_threads);	
 		else if (filter == "merge") {
 			ppm img2(arg_1);

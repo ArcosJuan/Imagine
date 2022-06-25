@@ -121,6 +121,7 @@ void _zoom(ppm& img, ppm& out_img, int n, int y_start, int y_end){
 }
 #pragma endregion _pixel2pixel_filters
 
+
 #pragma region pixel2pixel_filters
 void plain(ppm& img, unsigned char hue, int nthreads) {
 	auto foo = [&img, hue](int y_start, int y_end){
@@ -196,7 +197,7 @@ void zoom(ppm &img, int n, int nthreads){
 
 
 #pragma region convolution_filters
-void convolution_filter(ppm& img, ppm& out_img, float kernel[3][3], int y_start, int y_end) {
+void convolution_filter(ppm& img, ppm& out_img, float kernel[3][3], int y_start, int y_end, bool truncate) {
 	if (y_end == 0 || y_end == img.height) y_end = img.height-1;
 	if (y_start == 0) y_start = 1;
 	for(int y = y_start; y < y_end; y++){
@@ -208,6 +209,7 @@ void convolution_filter(ppm& img, ppm& out_img, float kernel[3][3], int y_start,
 					summation.addp(img.getPixel(i+y, j+x).mult(kernel[i+1][j+1])); 
 				}
 			}
+			if (truncate) summation.truncate();
 			out_img.setPixel(y-1,x-1, summation);
 		}
 	}
@@ -221,10 +223,28 @@ void boxBlur(ppm &img, int iterations, int nthreads) {
 		{1/9.f,1/9.f,1/9.f}
 	};
 	
-	for (int i=0; i<=iterations; i++) {	
+	for (int i=0; i<iterations; i++) {	
 		ppm out_image(img.width-2, img.height-2);
 		auto foo = [&img, &out_image, &kernel](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(out_image), kernel, y_start, y_end);
+			return thread(convolution_filter, ref(img), ref(out_image), kernel, y_start, y_end, true);
+		};
+		multi_threads(img, nthreads, foo);
+		img = out_image;
+	}
+}
+
+
+void sharpen(ppm &img, int iterations, int nthreads) {
+	float kernel[3][3] = {
+		{0, -1, 0},
+		{-1, 5, -1},
+		{0, -1, 0}
+	};
+	
+	for (int i=0; i<iterations; i++) {	
+		ppm out_image(img.width-2, img.height-2);
+		auto foo = [&img, &out_image, &kernel](int y_start, int y_end){
+			return thread(convolution_filter, ref(img), ref(out_image), kernel, y_start, y_end, true);
 		};
 		multi_threads(img, nthreads, foo);
 		img = out_image;
@@ -251,10 +271,10 @@ void edgeDetection(ppm &img, int nthreads) {
 	ppm img_y = img;
 
 	auto foo_x = [&img, &img_x, &kernel_x](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(img_x), kernel_x, y_start, y_end);
+			return thread(convolution_filter, ref(img), ref(img_x), kernel_x, y_start, y_end, false);
 	};
 	auto foo_y = [&img, &img_y, &kernel_y](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(img_y), kernel_y, y_start, y_end);
+			return thread(convolution_filter, ref(img), ref(img_y), kernel_y, y_start, y_end, false);
 	};
 
 	multi_threads(img, nthreads, foo_x);
