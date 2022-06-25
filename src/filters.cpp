@@ -30,7 +30,7 @@ void multi_threads(ppm& img, int nthreads, T thread_function) {
 
 
 #pragma region _pixel2pixel_filters
-void _plain(ppm& img, unsigned char hue, int y_start, int y_end) {
+void _plain(ppm& img, unsigned char hue, int y_start=0, int y_end=0) {
 	if (y_end == 0) y_end = img.height;
 	for(int y = y_start; y < y_end; y++){
 		for(int x = 0; x < img.width; x++) {
@@ -41,7 +41,7 @@ void _plain(ppm& img, unsigned char hue, int y_start, int y_end) {
 
 
 
-void _shades(ppm& img, unsigned char shades, int y_start, int y_end) {
+void _shades(ppm& img, unsigned char shades, int y_start=0, int y_end=0) {
 	// TODO: manage exceptions  (shades < 1).
 
 	float range = 255/(shades-1);
@@ -56,7 +56,7 @@ void _shades(ppm& img, unsigned char shades, int y_start, int y_end) {
 }
 
 
-void _brightness(ppm& img, float b, int y_start, int y_end) {
+void _brightness(ppm& img, float b, int y_start=0, int y_end=0) {
 	// TODO: manage exceptions  ( -1 > b > 1).
 	if (y_end == 0) y_end = img.height;
 	for(int y = y_start; y < y_end; y++){
@@ -67,7 +67,7 @@ void _brightness(ppm& img, float b, int y_start, int y_end) {
 }
 
 
-void _contrast(ppm& img, float contrast, int y_start, int y_end) {
+void _contrast(ppm& img, float contrast, int y_start=0, int y_end=0) {
 	if (y_end == 0) y_end = img.height;
 	for(int y = y_start; y < y_end; y++){
 		for(int x = 0; x < img.width; x++) {
@@ -80,7 +80,7 @@ void _contrast(ppm& img, float contrast, int y_start, int y_end) {
 }
 
 
-void _frame(ppm& img, int width, unsigned char hue, int y_start, int y_end){
+void _frame(ppm& img, int width, unsigned char hue, int y_start=0, int y_end=0){
 	if (y_end == 0) y_end = img.height;
 	for(int y = y_start; y < y_end; y++){
 		for(int x = 0; x < img.width; x++) {
@@ -92,20 +92,20 @@ void _frame(ppm& img, int width, unsigned char hue, int y_start, int y_end){
 }
 
 
-void _merge(ppm& img, ppm& img1, ppm& img2, float alpha, int y_start, int y_end) {
+void _merge(ppm& img1, ppm& img2, ppm& out_img, float alpha, int y_start=0, int y_end=0) {
 	// TODO: manage exceptions  (apha <= 1 && apha >= 0).
-	if (y_end == 0) y_end = img.height;
+	if (y_end == 0) y_end = out_img.height;
 	for(int y = y_start; y < y_end; y++){
-		for(int x = 0; x < img.width; x++) {
+		for(int x = 0; x < out_img.width; x++) {
 			// (r1*p1 + r2*p2, g1*p1 + g2*p2, b1*p1 + b2*p2).
 			// p1=alpha, p2=1-alpha.
-			img.setPixel(y,x, img1.getPixel(y,x).mult(alpha).addp(img2.getPixel(y,x).mult(1-alpha)));
+			out_img.setPixel(y,x, img1.getPixel(y,x).mult(alpha).addp(img2.getPixel(y,x).mult(1-alpha)));
 		}
 	}
 }
 
 
-void _zoom(ppm& img, ppm& out_img, int n, int y_start, int y_end){
+void _zoom(ppm& img, ppm& out_img, int n, int y_start=0, int y_end=0){
 	if (y_end == 0) y_end = img.height;
 	for(int y = y_start; y < y_end; y++){
 		for(int x = 0; x < img.width; x++) {
@@ -124,20 +124,25 @@ void _zoom(ppm& img, ppm& out_img, int n, int y_start, int y_end){
 
 #pragma region pixel2pixel_filters
 void plain(ppm& img, unsigned char hue, int nthreads) {
-	auto foo = [&img, hue](int y_start, int y_end){
-		return thread(_plain, ref(img), hue, y_start, y_end);
-	};
-
-	multi_threads(img, nthreads, foo);
+	if (nthreads != 1) {
+		auto foo = [&img, hue](int y_start, int y_end){
+			return thread(_plain, ref(img), hue, y_start, y_end);
+		};
+		multi_threads(img, nthreads, foo);
+	}
+	else _plain(img, hue);
 }
 
 
 void shades(ppm& img, unsigned char scale, int nthreads) {
-	auto foo = [&img, scale](int y_start, int y_end){
-		return thread(_shades, ref(img), scale, y_start, y_end);
-	};
+	if (nthreads != 1) {
+		auto foo = [&img, scale](int y_start, int y_end){
+			return thread(_shades, ref(img), scale, y_start, y_end);
+		};
 
-	multi_threads(img, nthreads, foo);
+		multi_threads(img, nthreads, foo);
+	}
+	else _shades(img, scale);
 }
 
 
@@ -145,59 +150,79 @@ void blackWhite(ppm& img, int nthreads) { shades(img, 255, nthreads); }
 
 
 void contrast(ppm& img, float contrast, int nthreads) {
-	auto foo = [&img, contrast](int y_start, int y_end){
-		return thread(_contrast, ref(img), contrast, y_start, y_end);
-	};
+	if (nthreads != 1) {
+		auto foo = [&img, contrast](int y_start, int y_end){
+			return thread(_contrast, ref(img), contrast, y_start, y_end);
+		};
 
-	multi_threads(img, nthreads, foo);
+		multi_threads(img, nthreads, foo);
+	}
+	else _contrast(img, contrast);
 }
 
 
 void brightness(ppm& img, float b, int nthreads) {
-	auto foo = [&img, b](int y_start, int y_end){
-		return thread(_brightness, ref(img), b, y_start, y_end);
-	};
+	if (nthreads != 1) {
+		auto foo = [&img, b](int y_start, int y_end){
+			return thread(_brightness, ref(img), b, y_start, y_end);
+		};
 
-	multi_threads(img, nthreads, foo);
+		multi_threads(img, nthreads, foo);
+	}
+	else _brightness(img, b);
 }
 
 
 void merge(ppm& img1, ppm& img2, float alpha, int nthreads) {
 	int height = (img1.height>img2.height) ? img2.height : img1.height;
 	int width = (img1.width>img2.width) ? img2.width : img1.width;
-	ppm img(width, height);
+	ppm out_img(width, height);
 
-	auto foo = [&img, &img1, &img2, alpha](int y_start, int y_end){
-		return thread(_merge, ref(img), ref(img1), ref(img2), alpha, y_start, y_end);
-	};
+	if (nthreads != 1) {
+		auto foo = [&out_img, &img1, &img2, alpha](int y_start, int y_end){
+			return thread(_merge, ref(img1), ref(img2), ref(out_img), alpha, y_start, y_end);
+		};
 
-	multi_threads(img, nthreads, foo);
-	img1 = img;
-		}
+		multi_threads(out_img, nthreads, foo);
+	}
+	else _merge(img1, img2, out_img, alpha);
+
+	img1 = out_img;
+}
 
 
 void frame(ppm& img, int width, unsigned char hue, int nthreads) {
-	auto foo = [&img, width, hue](int y_start, int y_end){
-		return thread(_frame, ref(img), width, hue, y_start, y_end);
-	};
-	
-	multi_threads(img, nthreads, foo);
+	if (nthreads != 1) {
+		auto foo = [&img, width, hue](int y_start, int y_end){
+			return thread(_frame, ref(img), width, hue, y_start, y_end);
+		};
+		
+		multi_threads(img, nthreads, foo);
 	}
+	else _frame(img, width, hue);
+}
 
 
 void zoom(ppm &img, int n, int nthreads){
 	ppm out_img (img.width * n, img.height * n);
-	auto foo = [&img, &out_img, n](int y_start, int y_end){
-		return thread(_zoom, ref(img), ref(out_img), n, y_start, y_end);
-	};
-	multi_threads(img, nthreads, foo);
+
+	if (nthreads != 1) {
+		auto foo = [&img, &out_img, n](int y_start, int y_end){
+			return thread(_zoom, ref(img), ref(out_img), n, y_start, y_end);
+		};
+		multi_threads(img, nthreads, foo);
+	}
+	else _zoom(img, out_img, n);
+
 	img = out_img;
 }
+
+
 #pragma endregion pixel2pixel_filters
 
 
 #pragma region convolution_filters
-void convolution_filter(ppm& img, ppm& out_img, float kernel[3][3], int y_start, int y_end, bool truncate) {
+void _convolution_filter(ppm& img, ppm& out_img, float kernel[3][3], bool truncate, int y_start=0, int y_end=0) {
 	if (y_end == 0 || y_end == img.height) y_end = img.height-1;
 	if (y_start == 0) y_start = 1;
 	for(int y = y_start; y < y_end; y++){
@@ -224,12 +249,17 @@ void boxBlur(ppm &img, int iterations, int nthreads) {
 	};
 	
 	for (int i=0; i<iterations; i++) {	
-		ppm out_image(img.width-2, img.height-2);
-		auto foo = [&img, &out_image, &kernel](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(out_image), kernel, y_start, y_end, true);
-		};
-		multi_threads(img, nthreads, foo);
-		img = out_image;
+		ppm out_img(img.width-2, img.height-2);
+
+		if (nthreads != 1) {
+			auto foo = [&img, &out_img, &kernel](int y_start, int y_end){
+				return thread(_convolution_filter, ref(img), ref(out_img), kernel, true, y_start, y_end);
+			};
+			multi_threads(img, nthreads, foo);
+		}
+		else _convolution_filter(img, out_img, kernel, true);
+
+		img = out_img;
 	}
 }
 
@@ -242,12 +272,17 @@ void sharpen(ppm &img, int iterations, int nthreads) {
 	};
 	
 	for (int i=0; i<iterations; i++) {	
-		ppm out_image(img.width-2, img.height-2);
-		auto foo = [&img, &out_image, &kernel](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(out_image), kernel, y_start, y_end, true);
-		};
-		multi_threads(img, nthreads, foo);
-		img = out_image;
+		ppm out_img(img.width-2, img.height-2);
+		
+		if (nthreads != 1) {
+			auto foo = [&img, &out_img, &kernel](int y_start, int y_end){
+				return thread(_convolution_filter, ref(img), ref(out_img), kernel, y_start, y_end, true);
+			};
+			multi_threads(img, nthreads, foo);
+		}
+		else _convolution_filter(img, out_img, kernel, true);
+
+		img = out_img;
 	}
 }
 
@@ -270,15 +305,22 @@ void edgeDetection(ppm &img, int nthreads) {
 	ppm img_x = img;
 	ppm img_y = img;
 
-	auto foo_x = [&img, &img_x, &kernel_x](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(img_x), kernel_x, y_start, y_end, false);
-	};
-	auto foo_y = [&img, &img_y, &kernel_y](int y_start, int y_end){
-			return thread(convolution_filter, ref(img), ref(img_y), kernel_y, y_start, y_end, false);
-	};
 
-	multi_threads(img, nthreads, foo_x);
-	multi_threads(img, nthreads, foo_y);
+	if (nthreads != 1) {
+		auto foo_x = [&img, &img_x, &kernel_x](int y_start, int y_end){
+				return thread(_convolution_filter, ref(img), ref(img_x), kernel_x, false, y_start, y_end);
+		};
+		auto foo_y = [&img, &img_y, &kernel_y](int y_start, int y_end){
+				return thread(_convolution_filter, ref(img), ref(img_y), kernel_y, false, y_start, y_end);
+		};
+
+		multi_threads(img, nthreads, foo_x);
+		multi_threads(img, nthreads, foo_y);
+	}
+	else {
+		_convolution_filter(img, img_x, kernel_x, false);
+		_convolution_filter(img, img_y, kernel_y, false);
+	}
 	
 
 	for(int y = 1; y < img.height-4; y++) {
